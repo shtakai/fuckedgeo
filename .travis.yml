@@ -1,0 +1,35 @@
+language: ruby
+dist: trusty
+sudo: required
+cache:
+  bundler: true
+  yarn: true
+  directories:
+    - node_modules
+    - vendor/bundle
+services:
+  - redis-server
+  - postgresql
+addons:
+  artifacts: true
+  chrome: stable
+  postgresql: '9.6'
+env:
+before_install:
+  - gem install bundler
+  # Install latest Chrome
+  - sudo apt-get update
+  - sudo apt-get install -y libappindicator1 fonts-liberation
+install:
+  - bundle install --jobs=3 --retry=3 --deployment
+before_script:
+  - cp config/application.yml.example config/application.yml
+  - bundle exec rake db:create db:schema:load
+  - bundle exec rake assets:clean assets:precompile
+script: bundle exec rspec --force-color
+#deploy:
+#  provider: heroku
+#  api_key: "$HEROKU_AUTH_TOKEN"
+#  app: fuckurl
+#  on:
+#    repo: shtakai/fuckedurl
