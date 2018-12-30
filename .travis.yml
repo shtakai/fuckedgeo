@@ -1,0 +1,29 @@
+language: ruby
+dist: trusty
+sudo: required
+cache:
+  bundler: true
+  directories:
+    - vendor/bundle
+services:
+  - redis-server
+  - postgresql
+addons:
+  artifacts: true
+  chrome: stable
+  postgresql: '9.6'
+env:
+before_install:
+  - gem install bundler
+  - sudo apt-get update
+install:
+  - bundle install --jobs=3 --retry=3 --deployment
+before_script:
+  - bundle exec rake db:create db:schema:load
+script: bundle exec rspec --force-color
+#deploy:
+#  provider: heroku
+#  api_key: "$HEROKU_AUTH_TOKEN"
+#  app: fuckurl
+#  on:
+#    repo: shtakai/fuckedurl
